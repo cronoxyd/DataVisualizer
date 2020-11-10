@@ -10,10 +10,11 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
 using System.Threading;
+using DarkUI.Forms;
 
 namespace SerialVisualizer
 {
-    public partial class MainForm : Form
+    public partial class MainForm : DarkForm
     {
         public SerialPort CurrentPort { get; private set; } = new SerialPort();
 
@@ -111,12 +112,38 @@ namespace SerialVisualizer
 
         private void HistogramMax_numericUpDown_ValueChanged(object sender, EventArgs e)
         {
+            HistogramMin_darkNumericUpDown.Maximum = HistogramMax_numericUpDown.Value - 1;
             if (!HistogramAutoMax_checkBox.Checked) histogramViewer1.Maximum = (float) HistogramMax_numericUpDown.Value;
         }
 
         private void MinMaxHold_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             histogramViewer1.MinMaxHold = MinMaxHold_checkBox.Checked;
+            GetArrays_darkButton.Enabled = MinMaxHold_checkBox.Checked;
+        }
+
+        private void HistogramMin_darkNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            HistogramMax_numericUpDown.Minimum = HistogramMin_darkNumericUpDown.Value + 1;
+            if (!HistogramAutoMin_darkCheckBox.Checked) histogramViewer1.Minimum = (float)HistogramMin_darkNumericUpDown.Value;
+        }
+
+        private void ResetMinMax_darkButton_Click(object sender, EventArgs e)
+        {
+            histogramViewer1.ResetMinMax();
+        }
+
+        private void GetArrays_darkButton_Click(object sender, EventArgs e)
+        {
+            DualOutput_Form dof = new DualOutput_Form()
+            {
+                UpperText = String.Join(", ", histogramViewer1.MaxData),
+                UpperTitle = "Maximum",
+
+                LowerText = String.Join(", ", histogramViewer1.MinData),
+                LowerTitle = "Minimum"
+            };
+            dof.ShowDialog();
         }
     }
 }
